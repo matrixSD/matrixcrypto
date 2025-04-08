@@ -2,14 +2,17 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>سيرفر اوسكر - شحن</title>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       direction: rtl;
-      font-family: 'Arial', sans-serif;
+      font-family: 'Almarai', sans-serif;
       background: #f0f0f0;
       text-align: center;
-      padding: 40px 20px;
+      padding: 20px;
+      margin: 0;
     }
 
     .container {
@@ -29,15 +32,16 @@
 
     input, select, button {
       width: 90%;
-      padding: 12px;
+      padding: 14px;
       font-size: 18px;
       margin: 10px 0;
       border-radius: 10px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     button {
-      background: #4CAF50;
+      background: #007bff;
       color: white;
       border: none;
       cursor: pointer;
@@ -45,7 +49,7 @@
     }
 
     button:hover {
-      background: #45a049;
+      background: #0056b3;
     }
 
     #result {
@@ -53,6 +57,13 @@
       font-weight: bold;
       font-size: 20px;
       color: #333;
+    }
+
+    #points {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #555;
     }
 
     table {
@@ -97,18 +108,39 @@
     }
 
     .pagination button.active {
-      background-color: #4CAF50;
+      background-color: #007bff;
       color: white;
     }
 
     .pagination button:hover {
       background-color: #bbb;
     }
+
+    /* تنسيق ريسبونسيف */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+        width: 90%;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      input, select, button {
+        font-size: 16px;
+      }
+
+      #result {
+        font-size: 18px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>سيرفر اوسكر</h1>
+    <div id="points">النقاط المتوفرة: 0💎</div>
     <input type="text" id="userId" placeholder="ادخل ID الخاص بك" />
 
     <select id="offerSelect">
@@ -141,8 +173,9 @@
   </div>
 
   <script>
-    const allOrders = [];
-    const rowsPerPage = 5;
+    let allOrders = [];
+    let rowsPerPage = 5;
+    let points = 0;
 
     function submitRecharge() {
       const userId = document.getElementById('userId').value.trim();
@@ -164,8 +197,12 @@
         resultDiv.innerText = `✅ تم اكتمال الطلب لـ ID: ${userId}`;
         resultDiv.style.color = "#28a745";
 
-        // حفظ الطلب مع التاريخ والوقت
-        allOrders.push({
+        // إضافة النقاط
+        points += parseInt(offerValue);
+        document.getElementById('points').innerText = `النقاط المتوفرة: ${points}💎`;
+
+        // إضافة الطلب في البداية
+        allOrders.unshift({
           id: userId,
           offer: offerText,
           timestamp: dateTime,
@@ -182,7 +219,7 @@
 
       const start = (page - 1) * rowsPerPage;
       const end = start + rowsPerPage;
-      const pageOrders = allOrders.slice(start, end).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));  // ترتيب العمليات من الأحدث للأقدم
+      const pageOrders = allOrders.slice(start, end);
 
       for (let order of pageOrders) {
         const newRow = tbody.insertRow();
